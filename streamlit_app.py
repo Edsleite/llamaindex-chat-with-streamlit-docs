@@ -1,6 +1,6 @@
 import streamlit as st
 from llama_index.llms.cohere import Cohere
-from llama_index.embeddings.cohereai import CohereEmbedding
+from llama_index.embeddings.cohere import CohereEmbedding
 try:
   from llama_index import VectorStoreIndex, ServiceContext, Document, SimpleDirectoryReader
 except ImportError:
