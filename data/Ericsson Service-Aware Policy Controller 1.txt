@@ -1,0 +1,488 @@
+Contents
+
+
+1 Introduction
+1.1 Document Purpose and Scope
+The Technical Product Description document aims to provide a technical and functional description of the Ericsson Service-Aware Policy Controller (SAPC) 1.
+
+The document describes the SAPC 1 role as the Ericsson product providing the policy control element for 5G and 4G Mobile, Fixed, and Convergent Broadband networks.
+
+Aspects related to operation and maintenance, internal architecture and deployment are briefly introduced as well.
+
+1.2 Disclaimer Note
+This document applies to the SAPC 1 main release and all its consecutive SW drops. The delivery dates of the specific functions may diverge. For specific details on General Availability dates, please check the SAPC Roadmap.
+
+2 Overview
+The SAPC is defined as a compound of the 3GPP Policy Control Function (PCF) and the 3GPP Policy and Charging Rule Function (PCRF). It provides a common policy umbrella for fix and mobile broadband core networks, whether they are 3GPP 5G Core based (System architecture for the 5G System (5GS) 3GPP TS 23.501 v16.11.0) or 3GPP Evolved Packet Core (EPC) based (General Packet Radio Service (GPRS) enhancements for Evolved Universal Terrestrial Radio Access Network (E-UTRAN) access, 3GPP TS 23.401 v15.10.0 and Architecture enhancements for non-3GPP accesses, 3GPP TS 23.402 v15.3.0). Therefore a single SAPC instance can be deployed as a combined PCRF/PCF.
+
+The SAPC is positioned as the advanced solution for the following business drivers:
+
+Multiaccess. The SAPC 1 release provides policy control for both Fixed accesses (like PPP or IPoE) and Mobile accesses (like GSM, UTRAN, E-UTRAN, and 5G NR).
+
+Convergence. Users may enter into the Service Network through different type of accesses, and policy control can manage consistently such users across such accesses. With such target, the SAPC 1 provides an Fixed-Mobile Convergence (FMC) policy control solution.
+
+Value Added Offerings. Operators are willing to monetize premium services and obtain more revenues segmenting the subscriber base. The SAPC allows the Operator to define complex offerings and, simultaneously, control the service delivery based on subscriber category, accumulated use, service type, and access conditions.
+
+Network Optimization. Multimedia services are consuming an ever increasing amount of network resources, and subscribers are increasing their use of these services. Operators must manage these services while providing them in a cost effective and reliable way. Quality of Service (QoS) control ensures that services do not over run the limited network resources and not degrade existing services, Service Level Agreements, and premium subscribers. There is a need to maximize the efficiency of the network from the terminal to the network edge, and the SAPC can control the corresponding parameters setting the right priorities and QoS to the different streams that traverse the transport plane. The output is an optimized network that gives the needed resources based on per subscriber and service policies. And that enables the implementation of voice optimization services, like Voice over New Radio (VoNR), Voice over Long Term Evolution (VoLTE), Video over Long Term Evolution (ViLTE), or Wi-Fi calling.
+
+Smart Traffic Management. Network architecture is evolving towards Software Defined Network (SDN). Ericsson Service Chaining solution enables operators to manage traffic in a smart way while keeping the focus on cost-driven network optimization. For such purpose, the SAPC provides real-time dynamic policy decisions based on network and subscriber information the SDN-Controller.
+
+The SAPC responds to these challenges by providing an advanced technical solution characterized by:
+
+Technology Leaders. First to market, the SAPC uses state-of-the-art platform technologies, focused in providing excellent characteristics measurements.
+
+Easy Integration. The SAPC can be easily integrated with any gateway supporting the standard 3GPP Policy and Charging Control (PCC) and 3GPP Service-Based Architecture (SBA) reference points. In addition, the SAPC can be north-bound integrated with Operation and Maintenance systems through standard interfaces like Simple Network Management Protocol (SNMP), Network Configuration Protocol (NETCONF), or Simple Object Access Protocol (SOAP).
+
+High Availability. The SAPC provides a fully redundant node architecture reaching 5x9's availability, based on a 1+1 Geographical Redundancy solution. Both active-standby and active-active deployment models are supported.
+
+3 Reference Architectures
+3.1 3GPP PCC framework for the 5G System
+The PCC Architecture for the 5G System is defined in 3GPP TS 23.503 (Policy and charging control framework for the 5G System (5GS); Stage 2, 3GPP TS 23.503 v16.11.0). This architecture provides Flow Based Charging; Policy Control for Session Management; Policies for Access and Mobility Management; and UE Policies.
+
+The 3GPP uses two different representation models for describing the network topology: the reference point representation (historically used in 3GPP former releases), and the new SBA representation. Figure 1 shows the 3GPP PCC Architecture for the 5G System according to the SBA representation (non-roaming case).
+
+
+Figure 1   3GPP PCC Architecture for the 5G System
+The SAPC, provides a 3GPP 5GC PCF compliant implementation. The 3GPP PCF provides policy control decisions for both Access and Mobility Management to be enforced at the Access and Mobility Management Function (AMF), and Session-Management Policy Control to be enforced at the Session Management Function (SMF). Such policy control decision can be based on dynamic service input provided by the Application Function (AF) or the Network Exposure Function (NEF), the subscriber profile data managed by the Unified Data Repository (UDR), PDU Session data reported by the SMF, AM Policy Request information sent by the AMF, subscriber spending limits reported by the Charging Function (CHF), or internal PCF events (for example, timers).
+
+A comprehensive description of the SAPC as 3GPP 5GC PCF is detailed in Ericsson Service-Aware Policy Controller 1, 5G Core PCF Overview.
+
+3.2 3GPP PCC Architecture
+The PCC Architecture is defined in 3GPP TS 23.203 (Policy and charging control architecture, 3GPP TS 23.203 v16.3.0). It provides the functions for policy, access, and charging control, as well as event reporting for Service Data Flows (SDF).
+
+Figure 2 describes the 3GPP PCC Architecture for the non-roaming case.
+
+
+Figure 2   3GPP PCC Architecture
+The SAPC, as Policy Server for Mobile Broadband Networks, provides a 3GPP PCRF compliant implementation. The 3GPP PCRF is the function responsible for the policy control decision, giving network control regarding the SDF detection, gating, QoS, and flow based charging (except credit management) towards the Policy and Charging Enforcement Function (PCEF) and/or Traffic Detection Function (TDF). Such policy control decision can be based on dynamic service input provided by the AF, subscriber profile data managed by the Subscription Profile Repository (SPR), IP-CAN Session data reported by the PCEF, subscriber spending limits reported by the Online Charging System (OCS), or internal PCRF events (for example, timers).
+
+The SAPC 1 provides:
+
+Gx implementation towards the PCEF. Examples of PCEFs can be a 3GPP Packet Data Networks Gateway (PDN-GW) or a Gi-Box like a Deep Packet Inspection (DPI).
+
+Rx implementation towards AFs. Examples of AFs can be an IP Multimedia Subsystem (IMS) Proxy Call Session Control Function (P-CSCF), a Streaming Server, or an Exposure Function.
+
+Sy implementation towards OCS.
+
+Sd implementation towards the TDF.
+
+Ericsson Service-Aware Policy Controller 1, PCRF Overview provides a complete the SAPC as 3GPP PCRF.
+
+3.3 Broadband Forum (BBF) Broadband Policy Control Framework Architecture
+The BBF TR-134 (Broadband Policy Control Framework (BPCF) BBF TR-134 Corrigendum 1) describes an architectural framework to give policy control for Fixed Broadband Multi- Service Networks. The document includes requirements for providing session-based policies, application admission control, bandwidth management, QoS management, security, multicast, routing policies, accounting and charging control, plus use cases related with policy control in Fixed Broadband Networks.
+
+The BBF TR-134 architectural framework is shown in Figure 3.
+
+
+Figure 3   BBF TR-134 Policy Architectural Framework
+As Figure 3 depicts, the BBF policy architectural framework contains a Policy Decision Point (PDP) responsible of making policy decisions for different Policy Enforcement Points (PEP) distributed along the User Plane. Such policy decision can be deployed by static activation, or can be dynamically made based on information provided by:
+
+AFs.
+
+Control Plane Network Elements, including Authentication, Authorization and Accounting (AAA) Server, a Network Management System (NMS), a data Repository, and even a PDP in the 3GPP domain - that is, a PCRF.
+
+The PDP in Figure 3 is a logical function that can be deployed in four different network elements. None of them is recommended, being then an Operator choice. Such PDP deployment alternatives are listed below:
+
+Embedded in the Multi Service-Broadband Network Gateway (MS-BNG) or Broadband Remote Access Server (BRAS).
+
+As part of an NMS.
+
+As part of the AAA infrastructure.
+
+As a standalone Policy Server.
+
+The SAPC, as Policy Server for Fixed Broadband Networks, provides a PDP compliant with BBF TR-134 standalone Policy Server deployment.
+
+3.4 3GPP and BBF Policy Convergence for Fixed Broadband and Mobile Broadband
+The Policy Convergence Architecture, which has been defined as a joint activity between 3GPP and BBF, is an extension of the PCC Architecture commented in 3GPP PCC Architecture. It is detailed in 3GPP TS 23.203 Annex S (Policy and charging control architecture, 3GPP TS 23.203 v16.3.0) and BBF TR-300 (Policy Convergence for Next Generation Fixed and 3GPP Wireless Networks, BBF TR-300 Issue 1).
+
+Figure 4 displays the Policy Convergence Architecture.
+
+
+Figure 4   Policy Convergent Architecture
+The Policy Convergent Architecture allows the implementation of a convergent control plane, with the PCRF as the convergent policy server. Therefore the same PCRF can make policy decisions to be enforced through Gx at the PCEF in the Mobile Core - for example, PDN-GW -, and at the PCEF in the Fixed Core - the MS-BNG. So it facilitates the definition of aligned service offerings, guarantees the end-user experience independently of the access technology used, and contributes to control the Operator capital and operational expenditures.
+
+3.5 ETSI Network Functions Virtualization (NFV) Framework
+ETSI GS NFV 002 (Network Functions Virtualisation; Architectural Framework, ETSI GS NFV 002 v1.1.1) standardizes the functional architectural framework for virtualized network functions and the supporting infrastructure. The high-level structure of the ETSI NFV framework is displayed in Figure 5.
+
+
+Figure 5   ETSI high-level NFV framework
+The SAPC is a cloud-enabled application, being a Virtualized Network Function (VNF) according to Network Functions Virtualisation; Architectural Framework, ETSI GS NFV 002 v1.1.1. Therefore the SAPC can be deployed on top of a Cloud System as NFV Infrastructure (NFVI).
+
+4 Solutions
+4.1 SAPC in Ericsson 5G Core System
+The Ericsson 5G Core System integrates products and solutions that build a complete 5G Core network. This includes Business Support System (BSS), Operations Support Systems (OSS), Packet Core, Policy Management, Communication Services and Cloud Infrastructure. This targets the support for a wide range of 5G business use cases through utilizing key enablers such as network slicing, cloud deployment of applications, and a high degree of automation.
+
+The SAPC is included in the Ericsson 5G Core System, providing the policy functions included in the 3GPP PCF.
+
+4.2 SAPC in Ericsson Virtual Evolved Packet Core (Virtual EPC)
+Operators consider NFV and cloud as the next-generation broadband network basis, owing to the flexibility (fast application deployment and automatic scalability on demand) and cost reduction (operational and capital expenditures) NFV and cloud provide. Therefore telecommunication applications are moving from native systems, including software (SW), middleware, and hardware (HW), to virtualized systems (SW-only), becoming then virtual applications.
+
+In such line, Ericsson has virtualized the complete Ericsson EPC portfolio. This is called the Ericsson Virtual EPC. The Ericsson Virtual EPC allows an easier and faster deployment of a dedicated EPC for a Mobile Virtual Network Operator, an Enterprise, or for controlling Internet of Things devices.
+
+The Ericsson Virtual EPC includes the following Ericsson virtual applications: the Virtual Evolved Packet Gateway (EPG), the Virtual SGSN-MME, the Virtual SAPC, and the Virtual Wi-Fi Mobility Gateway (WMG).
+
+4.3 SAPC in Ericsson IMS
+The IMS consists of a set of functions implementing a Service Network that enables person to-person and person-to-content communications, in various modes and in a highly personalized and controlled way. Originally designed by 3GPP for delivering IP Multimedia to mobile users, IMS has become a core component within 3G, cable TV, and next generation fixed telecoms networks. The IMS can be used in several different solutions, like VoNR, VoLTE, PSTN to IP, Visual Communication, and Business Communication.
+
+Ericsson IMS portfolio is the Ericsson state-of-the-art implementation of the IMS, fully virtualized, and ready for cloud deployments. Ericsson IMS is convergent, which enables Operators to run first-line communication services (for example, VoLTE) for both Fixed and Mobile Networks.
+
+The SAPC enhances the Ericsson IMS with policy control for GSM/UTRAN/E-UTRAN/NR accesses. Such policy control includes gating control, charging correlation, resource reservation, and bearer event notification. The SAPC enables the enforcement of such policy control either in the legacy EPC Network (as it is described in 3GPP PCC Architecture), or in the 5GC SBA-based Core Network (according to 3GPP PCC framework for the 5G System).
+
+4.4 SAPC in Ericsson Wi-Fi Calling
+The SAPC is integrated in Wi-Fi Calling network architecture by interacting with both the IMS domain and the EPC/5GC network. Subscribers can set up then a voice call from an untrusted Wi-Fi network through the IMS domain. So the QoS of such voice call is controlled through the Operator's EPC/5GC. The Ericsson WMG is the key network element for anchoring the data connection from the untrusted Wi-Fi domain to the Operator's EPC/5GC.
+
+The SAPC enables to dynamically set or modify the QoS and charging settings for Voice and Video services over Wi-Fi network including Wi-Fi/EURAN handover or Wi-Fi/NR handover.
+
+4.5 SAPC in Ericsson Integrated Policy and Charging
+In addition to the 3GPP PCC standard implementation of 3GPP Sy (which is defined for providing policy decisions based on spending limits, see Policy and charging control architecture, 3GPP TS 23.203 v16.3.0), Ericsson has developed the Integrated Policy & Charging solution. It is an Ericsson enhancement of the 3GPP standard: Ericsson solution enables abstracting the PCRF from the BSS layer complexity, and to abstract the OCS from the network complexity.
+
+The solution requests the deployment of both the Ericsson Charging System/Mobile Broadband Charging and the Ericsson SAPC. It provides the following improvements on top of the 3GPP standard:
+
+A unified PCRF and OCS subscription view: 3GPP Sy assumes that PCRF accesses to subscriber data in an SPR using Sp reference point, while OCS holds its own subscriber data. However, Ericsson Integrated Policy & Charging solution considers one single subscription provisioning point: the Ericsson Charging System/Mobile Broadband Charging.
+
+A uniform PCRF and OCS product catalogue handling for broadband data offers: the 3GPP architecture implies PCRF needs to have detailed information about the broadband data product catalog, and extensive logic to be able to select the applicable product among many overlapping products related to a subscriber. The Ericsson Integrated Policy & Charging solution hides such complexity to the SAPC, because of the needed information is directly reported (when needed) from the Ericsson Charging System/Mobile Broadband Charging.
+
+The SAPC supports 5GC PCF Session Management Policy Control in Ericsson Integrated Policy and Charging solution.
+
+4.6 SAPC in Ericsson SDN
+SDN is a network architecture that introduces programmability, centralized intelligence, and abstractions from the underlying network infrastructure. In SDN, the control plane logic is handled by a centralized server and the forwarding plane consists of simplified switching elements that are “programmed” by the centralized controller.
+
+Ericsson SDN solution consists on several functions, including the OpenDaylight® Platform, the Ericsson SDN-Controller, and the Evolved Flow Switch.
+
+The SAPC introduces the subscriber dimension into the Ericsson SDN Service Chaining solution.
+
+4.6.1 SAPC in SDN - Service Chaining
+Service Chaining is an SDN application that facilitates the integration of transparent Value-Added Services (VAS) into the Operators' service network. Service Chaining allows dimensioning each transparent VAS based on the traffic demand for such VAS. So Service Chaining solution improves the time to market for new services.
+
+The SAPC provides the subscription-based policy abstractions for Service Chaining by two different mechanisms:
+
+With Ericsson SDN-Controller: The SAPC can send real-time policy decisions based on network information and subscriber profile towards the Ericsson SDN-Controller. The SAPC reports then the IP-CAN Session state (PDN connection setup and termination) and the subscriber profile that applies to such IP-CAN Session. And the service chain selection is based on policy evaluation made in the SAPC.
+
+The communication between the SAPC and SDN-Controller is based on SOAP notifications.
+
+With Ericsson EPG: The SAPC provisions static PCC Rules for enabling the Ericsson EPG service chaining function, as it is described in Ericsson Packet Core Network Overview, 1/1551-HSC 113 02 Uen CH.
+
+5 Functions
+This section introduces the SAPC functions that are independent of the SAPC network role.
+
+The SAPC as a PCRF specific features are described in Ericsson Service-Aware Policy Controller 1, PCRF Overview. While the SAPC as 5GC PCF specific functions are presented in Ericsson Service-Aware Policy Controller 1, 5G Core PCF Overview.
+
+5.1 1+1 Geographical Redundancy
+The SAPC provides an 1+1 Geographical Redundancy solution. Such solution allows a robust and high-available the SAPC deployment, enabling seamless service continuation in case of failover. The overall the SAPC system availability reaches a target figure of 99.999%.
+
+The 1+1 Geographical Redundancy implies both the SAPCs in the geographical redundant system are connected through a replication channel. This replication channel is the responsible for the synchronization of the data between the mated pair elements.
+
+Therefore information like the subscriber profile, the available services, or the accumulated consumption are replicated. In addition, the state information the SAPC manages (thus the active IP Sessions for the subscriber) is also replicated.
+
+The SAPC supports two configuration modes for the 1+1 Geographical Redundancy solution:
+
+Active-Standby: Just one of the SAPC in the mated pair (the Active one) is processing the incoming traffic. If the Active SAPC goes down, the control is taken by the other SAPC (the Standby), which becomes the Active one.
+
+The SAPC provisioning is done only in the Active SAPC. The replication channel replicates such provisioning data into the other SAPC.
+
+Active-Active: Every the SAPC in the 1+1 pair processes the incoming traffic and the provisioning operations. And each the SAPC keeps the state of the other one. Therefore a single SAPC is ready to process automatically all the incoming traffic and provisioning operations when the other the SAPC cannot handle it.
+
+The solution considers each the SAPC in the 1+1 pair handles a maximum of a 50% of the traffic in normal operation (thus when both the SAPC are available).
+
+The 1+1 Active-Active Geographical Redundant solution is optimized (in performance and response time) when subscriber and session stickiness is implemented at network level. Thus the SAPC Diameter clients, the Diameter Routing Agent (DRA) or PCF service consumer must bind all the IP session requests for the same subscriber to the same the SAPC instance.
+
+Note:	The increment in the response time because of the lack of subscriber and session stickiness is a 300% in average.
+In case of peer failure or broken link, the SAPC Diameter clients, the DRA,, or PCF service consumer must be able to fail over to the other the SAPC instance in the 1+1 pair (fail-over procedure).
+
+Note:	When the SAPC is deployed as part of the Ericsson Integrated Policy and Charging solution, a DRA is required for active-active geographical redundancy deployments. The rationale of such requirement is the lack of support of the fail-over procedure by the Ericsson Charging System/Mobile Broadband Charging.
+5.2 Notifications to End-Subscribers or to External Systems
+The SAPC provides the capability of sending Short Messaging System (SMS) notifications and web services-based notifications to the subscriber or to an external system upon certain events.
+
+If SMS notifications are requested and configured, the SAPC sends the SMS notifications to the configured SMS Centers (SMSC) by Short Message Peer-to-Peer (SMPP) protocol. Notifications based on web services use SOAP/XML towards the web service end points, so they are also called SOAP notifications.
+
+SOAP notifications enable the implementation of several added-value policy use cases. For instance, they may be configured for providing SAPC statistics and key performance indicators to an Analytics Server (like UE-tracing); they may be used for reporting the subscriber-related information to the Mobile SDN for service chaining purposes; or they can be set-up in order to trigger the migration of a 4G provisioned subscriber towards the 5G UDR.
+
+The conditions that should be fulfilled to trigger a notification message are configured by notification policies. These policies could be defined per subscriber or subscriber group.
+
+Some possible examples of notifications are listed below:
+
+The amount of subscribed usage left is lower than a configured threshold.
+
+Usage limit is surpassed.
+
+Service access is restricted.
+
+QoS is downgraded.
+
+The subscriber is roaming and has consumed 50 MB; and from then on, the subscriber is going to be charged with roaming prices.
+
+The text of the notification message can be configured by the Operator, so the Operator may include different information depending on the notification event. The text of the message uses Unicode characters, allowing then to write the notifications text using Latin or non-Latin characters.
+
+Multiple destinations can be used simultaneously for the same notification.
+
+5.3 Policy Studio
+The SAPC Policy Studio is a Graphical User Interface (GUI) designed for easing the SAPC business operation and provisioning. The SAPC Policy Studio hides the SAPC data complexity, presenting the information to be provisioned in an understandable and easy-to-operate way.
+
+A single the SAPC Policy Studio instance can operate and provisioning several the SAPC applications instances.
+
+The SAPC Policy Studio can be either installed in an external Linux server, or deployed as a Virtual Machine (VM) in a cloud infrastructure.
+
+In addition, the SAPC Policy Studio provides the following functions:
+
+Single Point of provisioning for several SAPC instances.
+
+Search objects by name, attribute value and references.
+
+Problems detection, unused objects detection Top-down configuration.
+
+Condition builder.
+
+Workspaces local changes and Offline mode.
+
+Import and Export of the whole configured data.
+
+Import and Export of the information provisioned for a single subscriber.
+
+Management of different Policy Studio users and roles for security purposes, including read only user roles
+
+5.4 Overload Control and Load Regulation
+The SAPC is a robust telecommunication application, capable of controlling high load on their external interfaces (both signaling and OAM) and overload peaks without crashing.
+
+In addition to that, the SAPC provides a Load Regulation function. Such function enables to reject incoming traffic when the configured thresholds (for both memory or CPU load) are surpassed. The Load Regulation function prevents then the likelihood of an overload situation at the SAPC.
+
+Load Regulation function allows the prioritization of IMS Emergency Calls in case of overload situation.
+
+The SAPC is compliant then with ITU-T, Q543 (Digital Exchange Performance Design Objectives, ITU-T Q.543).
+
+5.5 UE Trace
+UE Trace is the SAPC tool enabling the tracing of any Gx, Rx, Sd, Sy, N7 (Session Management Policy Control) and N15 messages the SAPC is managing in real-time, and for a defined set of subscribers. Those subscriber are identified by the IMSI, MSISDN or the SIP-URI (SIP-URI is only applicable for the UE tracing of Rx messages).
+
+The UE Trace function requests the definition of a tracing session, which consists of a unique session identifier and one or several subscribers to be traced. The UE Trace session is activated per operator request, or can be scheduled for a specific time.
+
+The data of the UE Trace sessions are stored in XML files, in compliance with 3GPP TS 32.423 (Telecommunication management; Subscriber and equipment trace; Trace data definition and management, 3GPP TS 32.423 v14.0.0). Such files contain the records of all the active tracing sessions. In addition, a Packet Capture (PCAP) file per UE Trace session is generated once the UE Trace session is stopped. Both the XML files and the PCAP files can be downloaded into an external file system by SFTP.
+
+The UE Trace function also provides a real time viewer for the active UE Trace sessions.
+
+UE Trace is a tool useful for troubleshooting purposes. It is also a powerful tool in order to provide specific subscriber traffic input for business intelligence purposes.
+
+5.6 Event-Based Monitoring (EBM)
+EBM is a flexible network analytics and assurance solution for near-real-time event provisioning to external post-processing systems (called EBM servers). The SAPC behaves as an EBM client, using TCP connections for streaming the event records (binary stream) to one or several EBM servers.
+
+The SAPC streams event records related to Gx, Rx, Sy and N7 (Session Management Policy Control) transactions. Subscription-related information is also included as part of such event records.
+
+The SAPC provides tools for easing EBM management. Such tools allow to record the streamed EBM data into a binary log file, and to decode such binary EBM log file into human-readable text files.
+
+5.7 Session Context Exposure
+The SAPC provides the IP Session information to external systems by an the Analytics REST API. The information exposed includes four different set of data:
+
+IP Session Management Data, including the IP Session start time and the IP Session Update Time.
+
+Data related to the Access Network for the IP Session, like the Radio Access Type or the Mobile Country Code.
+
+Policy Management Data, for example the last Applied PCC Rules and its timestamp.
+
+Subscriber Fair Usage Policies Information, including the Total threshold and the Volume Consumption Counter. The SAPC can be configured for forcing a real time update of this information by triggering a reauthorization request towards the PCEF whenever the Session Context is requested by the REST API.
+
+Note:	SAPC 1 does not provide Session Context Exposure through the REST Analytics API for the 5GC PCF.
+6 Interfaces
+6.1 Reference Model
+A simplified reference model, focused on the North-Bound integration of the SAPC is shown in Figure 6. Detailed reference models for SAPC as a PCRF and SAPC as 5GC PCF are provided in Ericsson Service-Aware Policy Controller 1, PCRF Overview and Ericsson Service-Aware Policy Controller 1, 5G Core PCF Overview respectively.
+
+
+Figure 6   The SAPC Reference Model
+The integration points are described as follows:
+
+The SAPC offers the following interfaces towards OSS for configuration, fault management, and statistics:
+
+NETCONF for configuration management.
+
+SNMP for fault management.
+
+Command-Line Interface (CLI).
+
+The SAPC offers a REST API for provisioning or analytics (session context exposure function) purposes.
+
+The SAPC gives a REST API towards self-service Portals for subscriber profile modifications.
+
+The SAPC makes use of SOAP notifications for implementing web services-based notifications.
+
+The SAPC provides EBM information towards an EBM Server by streaming the EBM data over TCP connections.
+
+The SAPC provides an SMPP interface for sending SMS notifications to end subscribers.
+
+6.2 Statement of Compliance
+6.2.1 Policy Control
+The SAPC implements a 3GPP PCF according to Policy and charging control framework for the 5G System (5GS); Stage 2, 3GPP TS 23.503 v16.11.0. The SAPC is then compliant with the related service-based interfaces, as they are defined in the 3GPP Stage-3 Technical Specifications
+
+The SAPC provides the Npcf service as it is defined in 5G System; Session Management Policy Control Service; Stage 3, 3GPP TS 29.512 v16.11.0.
+
+The SAPC consumes the Nnrf service in compliance with 5G System; Network function repository services; Stage 3, 3GPP TS 29.510 v16.10.0.
+
+The SAPC consumes the Nudr service according to 5G System; Usage of the Unified Data Repository Service for Policy Data, Application Data and Structured Data for Exposure; Stage 3, 3GPP TS 29.519 v16.9.0.
+
+The SAPC consumes the Nbsf service described in 5G System; Binding Support Management Service; Stage 3, 3GPP TS 29.521 v16.9.0.
+
+The SAPC implements a Fixed-Mobile Convergent 3GPP PCRF according to Policy and charging control architecture, 3GPP TS 23.203 v16.3.0 and Policy Convergence for Next Generation Fixed and 3GPP Wireless Networks, BBF TR-300 Issue 1. Therefore the SAPC is compliant with the 3GPP PCRF interface specifications.
+
+The SAPC is compliant with 3GPP Gx and Sd interface specifications as they are defined in Policy and Charging Control (PCC); Reference points, 3GPP TS 29.212 v16.3.0.
+
+The SAPC is compliant with 3GPP Rx interface specifications, described in Policy and charging control over Rx reference point, 3GPP TS 29.214 v16.6.0.
+
+The SAPC is compliant with 3GPP Sy interface specifications as in Policy and charging control: Spending limit reporting over Sy reference point, 3GPP TS 29.219 v16.0.0.
+
+The SAPC is compliant with 3GPP Ud protocol implementation of the 3GPP Sp reference point, as it is specified in User Data Convergence (UDC); User data repository access protocol over the Ud interface; Stage 3, 3GPP TS 29.335 v16.0.0.
+
+The SAPC implements a Fixed Broadband PDP according to Broadband Policy Control Framework (BPCF) BBF TR-134 Corrigendum 1.
+
+6.2.2 Operation and Maintenance
+The SAPC supports NETCONF for configuration purposes according to Network Configuration Protocol (NETCONF) RFC 6241.
+
+The SAPC is compliant with the Ericsson standard alarm MIBS described in ERICSSON-ALARM-MIB.
+
+The SAPC reports statistics in 3GPP compliant XML report files as defined in Telecommunication management; Performance measurement; eXtensible Markup Language (XML) file format definition, 3GPP TS 32.435 v14.0.0.
+
+The SAPC is capable of transferring the Linux Audit Log towards an external Syslog server, in compliance with The Syslog Protocol, RFC 5424.
+
+7 SW Architecture
+The SAPC main software components are depicted in Figure 7.
+
+
+Figure 7   The SAPC SW Architecture
+The main architectural software components of the SAPC are the following:
+
+Protocol stacks:
+
+SOAP: It provides the SOAP notifications interface.
+
+Diameter: It is the entry point for Diameter-based signalling (for example, Gx).
+
+LDAP: It enables the SAPC interworking with an external SPR.
+
+HTTPs: It is used for the SAPC provisioning by REST resources.
+
+H2Proxy: It implements the entry point for the 5GC SBA services in the SAPC.
+
+NRF Client: This is SW component responsible for the communication with the Network Registration Function (NRF).
+
+Business Logic
+
+It provides the main core SAPC logic in a protocol independent way.
+
+Policy Engine
+
+This module selects and evaluates the applicable conditions that the business logic needs to consider for making policy decisions.
+
+Web Server for REST
+
+It is the server enabling the REST API provisioning and analytics operations.
+
+Policy Studio
+
+It is the GUI designed for enabling a user experience-centric SAPC business operation and provisioning.
+
+Common Components Framework (Middleware)
+
+It consists of a set of SW components providing platform capabilities, including the Operating System, the Networks Front-Ends and load balancing, the Telecommunications-grade framework, and utilities. Such components are provided by Ericsson Component Based Architecture (CBA) platform. The components used are listed below:
+
+LDE: It is the Linux operating system of the CBA platform.
+
+eVIP: It provides virtual IP and load balancing.
+
+CoreMw: It gives a programming framework, focused on telecommunication needs, towards the platform operating system. That framework provides tools for implementing Configuration storage (IMM), Performance Management (PM), High Availability, SW Management, Notifications and Alarms (NTF), Logging (LOG), and Backup and Restore (BRF).
+
+Trace: It contains the tracing framework used for troubleshooting purposes.
+
+JavaOAM: It is used for executing Java® based SW.
+
+COM: It implements the Ericsson Common Information Model (ECIM), providing NETCONF interface for Operation and Maintenance purposes.
+
+DBS: It provides the in-memory database for managing both SPR and state information.
+
+C-Diameter: It provides the Diameter stack.
+
+SS7 CAF: It provides the Stream Control Transmission Protocol (SCTP) transport connectivity.
+
+SEC: It is used for OAM passwords encryption.
+
+LM: It controls the status of the license keys associated with the commercial licensees.
+
+8 Operation and Maintenance
+8.1 Middleware
+The operation, maintenance, deployment, and handling functional area of the SAPC provides cost efficient handling and management support of the node. It covers all phases from factory configuration to normal operation.
+
+The Middleware implements a comprehensive set of network management standards from 3GPP and IETF for communicating network management purposes. Specifically, SNMP, NETCONF, and SOAP are supported.
+
+The SAPC CBA Middleware provides a component called COM that implements a manager-agent architecture. It allows easy integration of the SAPC with OSS and BSS in standards-compliant manner.
+
+8.2 Provisioning
+The SAPC offers a REST API for provisioning of subscriber and service-related data. This interface handles the creation, retrieval, update, and deletion of the SAPC subscribers, subscriber groups, services, and policies information.
+
+8.3 Node Configuration
+The SAPC offers a NETCONF interface for configuration of node management data. This interface handles the creation, retrieval, update, and deletion of the SAPC management information. Configuration commands can be logged.
+
+8.4 Fault Management
+The SAPC provides an SNMP interface for fault management functions to detect and isolate the improper behavior within the node.
+
+8.5 Performance Management
+The SAPC offers a Performance Management solution that collects and reports the data relevant to the application. The file formatting provided by the SAPC complies with Telecommunication management; Performance measurement; eXtensible Markup Language (XML) file format definition, 3GPP TS 32.435 v14.0.0. The supported file formatting is XML.
+
+8.6 Logging
+The SAPC maintains an application log, responsible for logging the events related with the SAPC operation (for example, data consumption limit for the subscriber has been reached). The SAPC logging framework allows enabling or disabling each log event, and the adjustment of the log event severity level.
+
+The application log is stored into log files. Those log files can be retrieved towards an external server by sftp.
+
+Individual logs can be enabled or disabled, and its severity can be configured.
+
+The SAPC also maintains a Linux Audit Log, which can be streamed towards an external system using Syslog.
+
+8.7 Security Management
+The SAPC provides OAM user management framework consisting on the use of role-based access control authorization. Either Local Authentication or LDAP Central Authentication can be used for checking user credentials and user access.
+
+The SAPC provides a set of predefined user OAM user roles:
+
+"OAM Super User": It has complete access to all OAM resources within the SAPC, including ssh-based system administration, the filesystem, the Provisioning REST API, and the Analytics REST API.
+
+"Provisioning Administrator": It has access only to the Provisioning REST API, and the Analytics REST API.
+
+"System Read Only": It has reading access to all OAM resources within the SAPC, including ssh-based system administration, the filesystem, the Provisioning REST API, and the Analytics REST API.
+
+"System Administrator": It has the rights for the administration of all non-security-related attributes and capabilities of a managed element, including features, configuration parameters, and monitoring.
+
+"System Security Administrator": It is responsible for the administration of the application security, including the definition of user accounts and user role authorizations.
+
+"Troubleshooter": It has the rights for accessing information needed for solving the SAPC instabilities, such as configuration parameters, the SAPC monitoring, and non-sensitive traces.
+
+"Operator": It has the capability of performing administrative OAM tasks such as backup, and surveillance.
+
+Moreover, additional (and customized) user OAM roles can be created by the SAPC administrators with the "OAM Super User" and the "System Security Administrator" roles.
+
+In addition, the SAPC 5GC PCF design is following the security principles defined in Security architecture and procedures for 5G System, 3GPP TS 33.501 v16.9.0.
+
+8.8 Backup and Restore
+Data handled by the SAPC can be persistently stored through the Backup and Restore function. Backups can be ordered manually and either scheduled for specific dates or periodically. Backups can be restored manually.
+
+8.9 Troubleshooting
+The SAPC includes a complete set of tools for troubleshooting purposes. Those tools includes, for instance, Packet Capture Tool, UE Trace or session-handler.
+
+The SAPC also provides an state-of-the-art SW tracing tool, based on Common Trace Format (CTF). This tool enables the definition of up to 14 tracing levels. It allows tracing on hierarchies of logical trace domains and single trace events. In addition, it is possible to make tracing by filters (for example, tracing per UE, or Gx message, or IP address)
+
+Detailed information about the SAPC troubleshooting is available in SAPC Troubleshooting Guide.
+
+8.10 License Management
+The SAPC controls the activation of the commercial licenses by SW keys. Such SW keys can be included in locally installed license key file. Or they can be requested to the Ericsson Network License Server (NeLS), which is a license storage and management solution that is running outside the application environment.
+
+If 1+1 Geographical Redundancy is to be deployed, the number of licenses to be ordered must be the double of the pricing parameter (thus the double of the number of IP sessions and AF sessions). Then in case one of the SAPC is down, the other the SAPC in the 1+1 pair can take the complete requested capacity without service interruption.
+
+9 Installation and Deployment
+The SAPC can be deployed as VNF, or installed as Physical Node Function (PNF) in a specific HW (Ericsson BSP 8100, or Ericsson NSP 6.1).
+
+Note:	Although PNF deployment in Commercial of the Self (COTS) is technically possible, the SAPC 1 does not include any specific documentation or scripts for PNF installation on COTS.
+9.1 PNF Deployment
+The SAPC 1 on BSP 8100 HW or NSP 6.1 HW is only available for upgrading existing SAPC 1 installations on PNF.
+
+9.2 VNF Deployment
+The SAPC 1 can be deployed as VNF on top of either OpenStack® or vmware® based NFVI. There are three delivery models available:
+
+System verification delivery model: The SAPC is system-verified over full Ericsson Cloud Execution Environment, using BSP 8100 as hardware infrastructure. This ensures the SAPC functionality and performance, and maximizes predictability.
+
+Certified or certification-level testing delivery model: The SAPC is delivered on a cloud infrastructure where certification tests have been run. Functionality and performance of the solution is secured through a streamlined system integration project. Lifecycle management is provided for SAPC only, although end-to-end support may be requested, if needed. SAPC is certified for deployments on vmware® NFVI, and Red Hat OpenStack® NFVI.
+
+Software-only delivery model: If deployment on a different OpenStack® NFVI infrastructure is required, the SAPC functionality and performance must be secured through a system integration project. Life cycle management is only provided for the SAPC. The SAPC provides information on the minimum requirements on the cloud infrastructure
+
+Detailed information about the SAPC 1 deployment as VNF is available in Virtual Service-Aware Policy Controller 1.

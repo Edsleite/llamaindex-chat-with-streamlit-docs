@@ -1,0 +1,444 @@
+Contents
+
+
+1 Introduction
+1.1 Document Purpose and Scope
+The Technical Product Description document aims to provide a technical and functional description of the Ericsson Service-Aware Policy Controller (SAPC) 1 as 3GPP Policy and Charging Rules Function (PCRF).
+
+There are additional SAPC 1 Technical Product Descriptions, describing the rest of the SAPC 1 capabilities:
+
+A SAPC 1 introduction, including its role in networks and Ericsson solutions, architecture aspects and OAM, is provided in Ericsson Service-Aware Policy Controller 1.
+
+The SAPC 1 requirements as Virtualized Network Function (VNF) are detailed in Ericsson Virtual Service-Aware Policy Controller 1.
+
+A description of SAPC 1 as 3GPP 5G Core Policy Control Function (PCF) is explained in Ericsson Service-Aware Policy Controller 1, 5G Core PCF Overview.
+
+1.2 Disclaimer Note
+This document applies to the SAPC 1 main release and all its consecutive SW drops. The delivery dates of the specific functions may diverge. For specific details on General Availability dates, please check the SAPC Roadmap.
+
+2 SAPC PCRF Overview
+The SAPC is defined as a compound of the 3GPP 5G Core PCF and the 3GPP PCRF. It provides a common policy umbrella for Fixed and Mobile Broadband core networks, either they are 3GPP Evolved Packet Core (EPC) based (General Packet Radio Service (GPRS) enhancements for Evolved Universal Terrestrial Radio Access Network (E-UTRAN) access, 3GPP TS 23.401 v16.7.0 and Architecture enhancements for non-3GPP accesses, 3GPP TS 23.402 v16.0.0), or 3GPP 5G Core based (System architecture for the 5G System (5GS) 3GPP TS 23.501 v16.11.0).
+
+The SAPC PCRF is compliant with the 3GPP PCRF as it is defined in Policy and charging control architecture, 3GPP TS 23.203 v16.3.0, with some additional Ericsson added-value functions. The SAPC provides a unified policy framework for governing the EPC network. This is achieved by SAPC provisioning of Policy and Charging Control (PCC) Rules into the User Plane functions. Such PCC Rules are decided based on subscription profile information and network conditions SAPC manages.
+
+The SAPC PCRF is a SW-only application. It can be deployed as a Physical Network Function (PNF); or as a VNF, either on OpenStack-based or vmware-based Network Functions Virtualization Infrastructure (NFV-I).
+
+3 SAPC PCRF Functions
+3.1 Policy Management for Mobile, Fix, and Convergent Networks
+Being a 3GPP compliant PCRF, the SAPC provides Multi-Access Policy Management to Network Elements implementing 3GPP Policy and Charging Enforcement Function (PCEF) in both the Mobile core - (for example, the Packet Data Networks Gateway (PDN-GW) - or Fixed Broadband core - for instance, the Multi Service Broadband Network Gateway (MS-BNG) - by Gx interface. Gx is a 3GPP standard interface which is based on IETF Diameter Credit Control Application -Diameter Credit-Control Application, RFC 4006 - and IETF Diameter base protocol Diameter Base Protocol, RFC 6733).
+
+Through this function, any User Plane Network Element supporting Gx can request policy information for a given IP session at IP Session establishment and modification.
+
+PCC is performed by installing/removing PCC Rules. A PCC Rule is a set of information including:
+
+Filters that enable the detection of traffic IP flows belonging to a service and allows PCEF to block those packet flows that does not match with the filter.
+
+Charging data that allows PCEF to apply different charging depending on the service.
+
+The applicable set of PCC Rules to install/remove in the PCEF might be obtained either through the subscriber profile/subscriber group profile or as a result of the evaluation of the applicable control policies.
+
+The following clauses describe the controls that can be applied.
+
+3.1.1 Bearer Quality of Service (QoS) Management
+The SAPC is the network element that enables a subscriber-based end-to-end QoS control, for both 4G and 5G Radio accesses. The SAPC can modify the QoS negotiated in the bearer plane according to local conditions defined by the Operator for 3GPP access. Bearer QoS control in combination with subscriber differentiation allows Operator to offer subscriber groups such as gold, silver, bronze subscriptions, where gold subscribers are favored over other subscribers.
+
+In order to manage the QoS assigned to a specific bearer, the SAPC can act on the parameters that 3GPP defines as part of the QoS information (see Policy and charging control architecture, 3GPP TS 23.203 v16.3.0). Such parameters include the QoS Class Identifier (QCI), Guaranteed Bit Rate (GBR), Maximum Bit Rate (MBR), Access Point Name - Aggregated Maximum Bit Rate (APN-AMBR), and Allocation Retention Priority (ARP).
+
+With Bearer QoS Management, the Operator can implement different kind of controls like the listed below (not restrictive list):
+
+Controlling the maximum bandwidth per dedicated bearer and per subscriber.
+
+Guarantee that the bearer QoS corresponds with the requirements of the service.
+
+Prioritize a premium service over others that are not profitable in case of congestion.
+
+The SAPC supports Bearer QoS Management for both the default and dedicated bearers. For the default bearer, the SAPC controls the maximum and minimum QoS values, which may depend on subscriber or subscriber group and other parameters configured by policies. These QoS control policies evaluate conditions based on the subscriber profile, User Equipment (UE) information, Radio Access Type (RAT), or location. For example, it enables Operators to control the QoS for subscribers roaming in different networks (Serving Gateway change) or when changing from between different radio technologies - RAT changes. If there is a default bearer modification owing to a network condition change, the SAPC is able to recalculate the QoS bound to the default bearer.
+
+The SAPC allows network-initiated QoS control for dedicated bearers. Dedicated bearers are extra logical transmission paths that have a particular QoS characteristic and a set of filters that define which IP flows are traversing the bearer. By dedicated bearers, an Operator can control the QoS granted for a particular service delivery, depending also on subscriber categorization and state. The SAPC can decide to setup/update/remove a dedicated bearer upon receiving the following events:
+
+IP-CAN session setup or IP-CAN session modification: The decision of initiating a new bearer might be triggered by policy decisions based on the subscription profile. It means that new bearers are triggered when the UE is establishing the default bearer or when there is a modification in the IP-CAN Session.
+
+Change of the subscriber profile data by provisioning.
+
+When the usage limit for the subscriber is surpassed (see Fair Usage Policies): The prioritization assigned to a particular service delivery can be removed (that is, remove a dedicated bearer).
+
+Note:	Bearer QoS Management is not applicable for Fixed Broadband Networks, owing to the bearer concept does not exist in Fixed Broadband.
+3.1.2 Bandwidth Management
+The SAPC provides real-time Bandwidth Management to control the peak throughput on a per service and subscriber basis. This bandwidth control is limited to the enforcement point, not being transmitted to the other nodes in the network (for example, Radio Access Network nodes). So then it is applicable for both Fixed and Mobile Access.
+
+Either PDN-GW, Deep Packet Inspection (DPI), or MS-BNG reacts on the information received from the SAPC to enforce the requested service throttling. Throttling acts on the single IP flow (service) independently of the actual congestion in the network and has an immediate impact on the service performance. It tries to avoid that scarce resources are becoming congested.
+
+3.1.3 Charging Control
+The SAPC provides charging information at two different levels:
+
+Subscriber level: It includes data like charging method (online/offline) or Charging Systems addresses.
+
+Service Level: It includes the charging information (rating group) applicable per service.
+
+The charging information might be obtained either through the Subscriber/subscriber group profile or as the result of the evaluation of the Charging Rules within the SAPC Rule Engine.
+
+3.1.4 Access Control
+The SAPC permits or rejects IP-CAN Session Establishment and Modification operations, according to Operator defined policies. For instance, the SAPC may allow the restriction of the number of IP-CAN Sessions per subscriber and PDN Identifier. The Operator can define specific policies for rejecting the session activation/modification under certain circumstances (for instance, disconnect the IP-CAN Session when modification message has RAT=WLAN).
+
+In addition, the SAPC can provide Access Control per service (thus controlling the authorization of individual services, when a service a set of IP flows), and for a particular user under different access conditions. Service access control functionality decides whether the IP flows are allowed to progress, are dropped, or are redirected to a web portal.
+
+Service Access Control is done in three steps: first the SAPC selects the applicable services to evaluate; then evaluates such selected services to decide which ones are authorized; and finally installs the authorized services in the enforcement node.
+
+3.1.5 Multiple PCEF Support
+The SAPC can provide the policy decisions to be enforced for a single IP-CAN Session to two or more PCEFs simultaneously. Therefore the SAPC is able to decide what policy control functions can be enforced by each PCEF for that session.
+
+This functionality also enables the SAPC to take into account information received from one PCEF for making a policy decision that is enforced in second PCEF. As an example, Multiple PCEF Support can be used for getting usage reporting information while the policy dethe policy decisions based on the accumulated usage (see Fair Usage Policies) are enforced in the PDN-GW.
+
+The set of functions to be enforced by each PCEF can be configured by the Operator. The SAPC only executes controls applicable for the requested PCEF according to the control configuration information. The splitting can be changed during the SAPC live operation.
+
+3.1.6 Application Detection and Control (ADC)
+The 3GPP ADC function allows the SAPC to be aware of the User Plane traffic detection - at the PCEF, or at the Traffic Detection Function (TDF) - of a specific service. Based on such awareness, the SAPC is able to update the IP-CAN Session when either the subscriber actually starts using such service (and then enabling the delivery of such a service on a dedicated bearer), or when the subscriber stops to use it.
+
+The SAPC implements the 3GPP ADC function on the Gx interface (when the User Plane traffic detection, thus the ADC function, is performed at the PCEF), and on the Sd interface (when the ADC function is carried out by the TDF).
+
+The function permits to dynamically define the criteria for activating the service reporting or not at the PCEF (Gx) or TDF (Sd). Such criteria can be based on the IP Session information provided by the PCEF, subscription profile data, or Time of Day.
+
+In addition, and only when the ADC function is performed by the PCEF, the SAPC can indicate the PCEF to trigger a redirection whenever the services to be controlled are detected.
+
+3.1.7 Presence Reporting Area (PRA) Support
+Presence Reporting Area (PRA) Support is a 3GPP PCC standard function allowing the implementation of location-based policy control in a multi-vendor Packet Core environment. Policy and charging control architecture, 3GPP TS 23.203 v16.3.0 defines the PRA as an area within 3GPP Packet Domain for the purposes of reporting of UE presence within that area due to policy control and/or charging reasons. There are two types of Presence Reporting Areas: "UE-dedicated Presence Reporting Areas", and "Core Network preconfigured Presence Reporting Areas".
+
+The PRA Support function enables the SAPC dynamic subscription to 3GPP UE presence reporting events from the core network . Then the SAPC can receive the 3GPP UE PRA information whenever the UE attaches or moves into a new MME/SGSN, or the MME/SGSN detects the 3GPP UE has entered or left a PRA. Therefore the SAPC can use PRA into the policy decision.
+
+Note:	PRA support is not applicable for Fixed Broadband Networks.
+3.1.8 Advanced Policy Controls (Ericsson Gx+)
+Ericsson has extended the standard Gx capabilities in order to implement Advanced Policy Controls. Those Advanced Policy Controls can be only provided by a joint solution provided by either the Ericsson Evolved Packet Gateway (EPG) as PCEF, and the SAPC. This is the Ericsson Gx+ reference point. Consequently it is only applicable for Mobile Broadband deployments, and with Ericsson products.
+
+The Advanced Policy Controls are the following:
+
+Rule space management: A Rule Space defines the set of static PCC Rules that might be potentially assigned to a particular subscriber. The Operator may define different Rule Spaces but only one can be active. Once the Rule Space has been selected at IP session setup, it cannot be modified.
+
+At IP-CAN Session Establishment, the Ericsson EPG may suggest a rule space. However, the SAPC may override such suggestion and select a different one. The SAPC is able to select it based on policies whose inputs may be subscription information, date, and time or any data received from the access gateway such as PDN Identifier or RAT.
+
+Redirection information for non-authorized services: The Ericsson EPG may decide whether to redirect or not a service request that is not authorized and to which server based on authorization result codes provided by the SAPC.
+
+Content-filtering: The SAPC provides the applicable content-filtering profile per subscriber to the Ericsson EPG. The Ericsson EPG makes use of this profile to decide whether to allow or not the subscriber to access to a specific URL content. The SAPC obtains the value of the content-filtering profile as the result of Operator defined policies evaluation.
+
+Header enrichment: The SAPC is able to provide subscriber-related information the Ericsson EPG can insert in the HTTP headers of a particular request. Then a third-party application can receive a user alias, so sensitive data like the MSISDN is not disclosed to them. The SAPC allows the Operator to define any kind of data to be inserted.
+
+PCRF-Assisted APN Selection: The Ericsson EPG may request the SAPC to change the APN for the subscriber and the IP-CAN Session by Ericsson Gx+. The SAPC, as the result of a Flexible Output Protocol policy (see Flexible Output Protocol), introduces the APN to be used for such subscriber IP-CAN Session, plus the DIAMETER-AUTHORIZATION-REJECTED result code. The Ericsson EPG retries then the IP-CAN Session Establishment for the new APN, which is authorized by the SAPC.
+
+The Advanced Policy Controls through Ericsson Gx+ are only applicable to the default IP-CAN Session.
+
+3.1.9 Service Chaining with Ericsson Packet Core
+The SAPC provides support to Ericsson EPG service chaining function by means of the provisioning of static PCC Rule, as it is described in Ericsson Packet Core Network Overview, 1/1551-HSC 113 02 Uen CH.
+
+3.2 Policy Management for Wi-Fi Access
+The SAPC provides policy control decisions to the Ericsson EPG by 3GPP Gx when Wi-Fi access is used. The scenario is the following:
+
+The SAPC identifies that the subscriber is making use of a Wi-Fi access. This is due to the Gx Credit Control Request (CCR) message for the IP-CAN Session establishment includes the RAT set to WLAN and the IP-CAN-Type set NON-3GPP-EPS.
+
+The SAPC provides then specific policies per subscriber for such Wi-Fi access, which are enforced by the Ericsson EPG.
+
+The main application of this function is the provisioning of QoS and Charging settings for voice and video services over Wi-Fi (that is, Wi-Fi calling), including the support of Wi-Fi to E-UTRAN (4G) handover. The SAPC is the responsible for providing Dynamic Policy Control for the Wi-Fi calling as it is described in Dynamic Policy Control.
+
+3.3 Subscription Management
+The SAPC logic, upon receiving an input request, uses several data entities to generate the different outputs. The basic data entity is the subscriber profile. The SAPC logic is able to find the subscriber profile upon receiving a traffic identifier, like the Network Access Identifier (NAI).
+
+Once the subscriber has been identified, the applicable profile results from the combination of the subscriber profile associated with such subscriber identifier and the profiles associated for the different subscribing offerings the subscriber belongs to. One subscriber can be associated with multiple service offerings. Each service offering defines the profiles characterizing such subscription. The criteria to decide which offering is applicable at any time is based on the priority level and validity time associated with the relationship between subscriber and the service offering.
+
+The subscriber profile includes data such as:
+
+Subscriber groups: Group to which the subscriber belongs to.
+
+Subscribed Services: List of specific services associated with the subscriber.
+
+Denied services: List of specific forbidden services associated with the subscriber.
+
+Operator Specific Info: Data defined by the Operator that can be used for policy evaluation
+
+Fair Usage limits can also be defined at subscriber level.
+
+There might be cases where the policy data applicable to a subscriber cannot be obtained using static data because they also depend on dynamic conditions. For example, the service authorization can or not depend on the time of the day. For such cases, the Operator may configure business rules that evaluate the dynamic conditions. The evaluation of such rules gives the applicable data for the current dynamic conditions the subscriber is under.
+
+3.3.1 Auto-provisioning
+The SAPC allows the automatic creation of a subscriber in the SAPC database when the PCEF requests an IP session establishment. As a result of the auto-provisioning operation, the SAPC assigns a subscriber group to the auto-provisioned subscriber. Such subscriber group may be the auto-provisioning subscriber group (static assignment); or may be dynamically assigned after rule evaluation (making use of inputs like time, date, or dynamic information received in the Gx queries like the user location).
+
+The auto-provisioning allows the definition of usage control limits as well.
+
+Auto-provisioning avoids the need of performing the subscribers provisioning at SAPC before starting the SAPC operation - reducing then the SAPC integration costs in Operator networks. From network point of view, auto-provisioning is feasible because of the IP session establishment request is received by the SAPC after the subscriber has been authenticated by the network.
+
+The SAPC also includes a default profile, called Unknown Subscriber Profile, which does not provision any subscriber entry in the SAPC. This Unknow Subscriber Profile enables providing policy control for subscribers that do not need a dedicated management.
+
+3.4 Dynamic Policy Control
+This function allows the adaptation of the service delivery to the conditions negotiated in the User Plane through introducing the application input into the SAPC policy decision. The application in this context is called Application Function (AF), and can take the role of the actual application (or example, a streaming server); or a proxy that has all the service information - like the Proxy Call Session Control Function (P-CSCF) in IMS.
+
+The AF is able to send service information to the SAPC by the 3GPP Rx interface (Policy and charging control over Rx reference point, 3GPP TS 29.214 v16.6.0). The service information includes the set of IP flows that define a media component: media type (for example, audio, video), Application Identifier, and requested bandwidth.
+
+Based on such service information, the SAPC generates dynamically the PCC Rules that are to be installed in the enforcement point at the User Plane.
+
+Dynamic Policy Control may be used for both IMS (that is, services based on session negotiation) and non-IMS services. The differences are explained in the clauses below.
+
+3.4.1 Dynamic Policy Control for IMS Services (VoLTE and Wi-Fi Calling)
+Note:	This clause is generally applicable to services that are based on session negotiation, not only to IMS Services.
+IMS requires a signaling negotiation between the two peers trying to establish a connection before accessing to a particular service. The reason of such signaling negotiation is to define the characteristics of the bearer where the service is delivered. The involved peers use the Session Description Protocol (SDP) data to negotiate the session parameters, including the media streams to be used (such as video, audio, media codec).
+
+The SAPC is the responsible for binding the agreed session parameters with the PDN connection data. The SAPC ensures that then enough resources are established in the User Plane to execute the service according to the parameters negotiated in the Application Plane. Therefore only authorized media are executed in the IP-CAN Session.
+
+For such purpose, the AF (that is, P-CSCF in IMS) transfers to the SAPC the set of IP flow that defines a media component, the media type (for example, audio, video), the application identifier, the requested bandwidth, and the rest of the data included in the negotiated SDP. The SAPC uses such data to generate dynamic PCC Rules per each media subcomponent, and to determine their associated QoS. Those dynamic PCC Rules are then sent to the PDN-GW (PCEF), the responsible of making the actual enforcement.
+
+Dynamic PCC Rules are dynamically generated and/or modified by the SAPC upon reception of Rx messages. Dynamic PCC Rules include information about:
+
+Service Data Flow (SDF) filters: These filters are used by the PDN-GW (PCEF) to filter the IP traffic within a bearer to determine, at IP flow level granularity, what services are allowed to be passed to the desired end point.
+
+QoS information: QCI, ARP, MBR and, if applicable, GBR data. These data defines the characteristics of the bearer instantiated or modified. QoS is obtained using Operator defined rules that use as input the Rx application identifier, the media component type, and subscriber profile.
+
+Gating control data: Upon request from AF, gating control enables or disables temporarily the passing of an SDF through the PDN-GW (PCEF).
+
+Charging information for those SDFs: The value of the charging information is calculated by SAPC based on the combination of media information (for example, media type or media flow direction), subscriber associated policies that can evaluate conditions such as date and time, other information received from the PDN-GW (for example, RAT, APN or location information), and subscriber provisioned information.
+
+Charging Correlation: It makes possible the correlation of the charging information generated by the User Plane and the Application Plane at the Charging System.
+
+Resource Allocation Notification: The SAPC may indicate the User Plane that confirmation of successfully allocated resources is requested.
+
+Dynamic Policy Control is used for implementing IMS services like VoLTE, where features like path reservation, call termination and the reporting of transmission events to the IMS network request the deployment of a PCRF like the SAPC.
+
+In addition, the SAPC is the enabler of the VoLTE Single Radio Voice Call Continuity (SRVCC) function. SRVCC provides the capability to handover VoLTE calls from the Packet Switch (PS) domain to the Circuit Switch (CS) domain whenever coverage or resources on LTE networks cannot guarantee voice quality.
+
+During the SRVCC procedure, the SAPC receives an indication from the PCEF that one or more PCC Rules cannot be maintained because of PS to CS handover. The SAPC may then report to the P-CSCF the bearer has been deactivated because of a PS to CS handover. And the call can continue in a seamless way.
+
+3.4.2 Dynamic Policy Control for Non-IMS Services (IPTV)
+Upon an Rx AF reporting regarding the service delivery start, the SAPC is able to trigger an IP-CAN Session modification that may imply the PDN-GW (PCEF) either updates the policies for the default bearer or sets up a dedicated bearer. In the same way, when the AF reports the service delivery has finished, the SAPC performs another IP-CAN Session modification, so the PDN-GW (PCEF) may either downgrade the policies to their first value for the default bearer, or remove the dedicated bearer.
+
+As an example, let us consider a network where the DPI function provides an Rx interface towards the SAPC. In such scenario, the DPI function takes the AF role. The DPI function can be then configured to detect some service flows traversing it (for instance, flows related with IPTV). Therefore the DPI function can report the SAPC when a service delivery begins. Consequently the SAPC is able to update the IP-CAN Session to change the applicable QoS for the default bearer according to the service needs. And once the DPI reports the service delivery has finished, the SAPC modifies the IP-CAN Session. So the default bearer QoS is refreshed to the one assigned before the initial detection of the service.
+
+3.4.3 Network Location (NetLoc)
+NetLoc function allows the reporting of the Access Network Information to the Service Layer Domain (for example, the IMS domain) by the SAPC.
+
+NetLoc is usually requested for VoLTE and ViLTE communications because of regulatory issues. It can be used as well for location based charging of the VoLTE/ViLTE service.
+
+The SAPC provides NetLoc function when EPC-based untrusted WLAN access is used as well.
+
+NetLoc function is activated based on Service Layer request to the SAPC at AF session establishment. It must be provided at any AF session event (for instance, at VoLTE/ViLTE session establishment, update or termination), and at the IP-CAN Session or Bearer termination events that may affect an ongoing AF session.
+
+3.4.4 Emergency Calls
+The SAPC is able to handle both IMSI and non-IMSI based emergency calls. Therefore, if the PCEF does not include the Subscription-Id AVP but includes the IMEI within the User-Equipment-Info AVP, the Emergency call proceeds.
+
+The option to accept unauthenticated emergency services with IMEI identifier can be switched on and off by configuration.
+
+3.4.5 Multimedia Priority Services
+The Multimedia Priority Services (MPS) function allows the prioritization of the service delivery for qualified users. Its main application is the priority management for access congestion situations.
+
+The SAPC provides support for MPS as it is described by 3GPP PCC architecture (Policy and charging control architecture, 3GPP TS 23.203 v16.3.0), and for two different use cases:
+
+Subscription-based MPS: The subscriber has a MPS subscription attached to its subscription profile. If access congestion happens, the service delivery for such subscriber is always prioritized against others.
+
+On-demand MPS: The prioritization is granted per service session, based on AF (for example, the P-CSCF) request.
+
+3.4.6 IP-CAN Type Change Notification
+The IP-CAN Type Change Notification is a standard 3GPP PCC function. A PCRF implementing this function reports to the AF a change in the IP-CAN type (for example, from 3GPP-EPS to 3GPP-GPRS) and/or the RAT type (for example, from E-UTRAN to WLAN) during the IP-CAN Session lifecycle. This function is used for updating the policies to be enforced considering changes in the access network.
+
+The SAPC implements the 3GPP standard IP-CAN Change Notification function as it is described in 3GPP TS 29.214 (Policy and charging control over Rx reference point, 3GPP TS 29.214 v16.6.0).
+
+Note:	The SAPC does not support the management of IP Flow mobility routing rules. Therefore the Notification of IP-CAN Type Change due to IP Flow mobility is not implemented.
+3.4.7 Subscription and Notification of Signalling Path Status
+The Subscription and the Notification of the Signalling Path Status function is a standard 3GPP PCC function. It allows the PCRF to report the release of the User Plane transmission path to the AF. For such purpose, the AF must be subscribed to such notification at AF session establishment.
+
+In general, the AF subscribes to Notification of Signalling Path Status in a dedicated AF (Rx) session. This AF session is different than the AF sessions created for handling the dynamic services activation/deactivation (that is the delivery of the VoLTE/ViLTE communication). So half of the licensed AF sessions capacity can be devoted for delivering the VoLTE/ViLTE communication.
+
+The SAPC implements the Subscription and Notification of Signalling Path Status function as it is described in 3GPP TS 29.214 (Policy and charging control over Rx reference point, 3GPP TS 29.214 v16.6.0).
+
+Note:	The SAPC does not support the Gxx reference point towards the Bearer Binding and Event Reporting Function (BBERF). Therefore this function is not provided for the Gxx-based Subscription and Notification of the Signalling Path Status.
+The SAPC does not support the Release Cause Code. The SAPC does not support the INDICATION_OF_LOSS_OF_BEARER value in the Specific-Action AVP. The Notification of Signalling Path Status for both items is consequently not implemented
+
+3.4.8 IMS Restoration Support: Provisioning of AF Signalling Flow Information
+The SAPC implements the support to IMS Restoration based on the 3GPP PCC Provisioning of AF Signalling Flow Information Procedure as it is described in 3GPP TS 29.214 (Policy and charging control over Rx reference point, 3GPP TS 29.214 v16.6.0). This function is used by the IMS Restoration procedures to provide the address of the P-CSCF selected by the 3GPP UE to the PDN-Gateway (see IMS Restoration Procedures, 3GPP TS 23.380 v16.2.0).
+
+For such purpose, and after 3GPP UE registration to the IMS network, the SAPC provides the P-CSCF the 3GPP UE is using for such IMS session to the PDN-GW (PCEF). The PDN-GW (PCEF) monitors the P-CSCF status. And if it does not respond, the PDN-GW (PCEF) can update all the 3GPP UEs about it, triggering the discovery for a new P-CSCF.
+
+3.4.9 VoLTE Roaming
+The SAPC is compliant with the PCRF requirements for a VoLTE roaming architecture stated in the S8 Home-Routed (S8HR) model, which is defined in IMS Roaming, Interconnection and Interworking Guidelines, GSMA IR.65. Such model considers the PDN-GW (PCEF), the PCRF and the P-CSCF are located in the Home Public Land Mobile Network (H-PLMN), even when the UE is roaming.
+
+Consequently, the SAPC provides the Visited PLMN (V-PLMN) identification to the P-CSCF when the SAPC receives it from the PDN-GW (PCEF). In addition, and in order to enable IMS Emergency Calls when the UE is roaming, the SAPC provides the EPC-level identities (MSISDN, IMSI and IMEI) to the P-CSCF during either an IMS emergency registration, or an IMS emergency session establishment.
+
+3.5 Event Exposure
+The SAPC supports the exposure use case called "Setting up an Application Server (AS) session with required QoS", as it is described in IMS Roaming, Interconnection and Interworking Guidelines, GSMA IR.65.
+
+Such use case considers a third party AS can require a specific combination of QoS parameters and priority handling in order to deliver the service to its customers. For such purpose, the Service Capability Exposure Function (SCEF) exposes this functionality towards the AS: when the SCEF receives the request from the AS to provide QoS for an AS session, the SCEF acts as an AF (thus using Rx reference point as it is described in Dynamic Policy Control for Non-IMS Services (IPTV)).
+
+3.6 Integrated Policy and Charging - Policy Control Based on Spending Limits
+The SAPC allows the introduction of the spending limits the 3GPP Online Charging System (OCS) is handling into the policy decision chain. That is the target of the 3GPP Sy interface (Policy and charging control: Spending limit reporting over Sy reference point, 3GPP TS 29.219 v16.0.0), which conveys information about the spending limits status. Being a standard-defined interface, the 3GPP Sy permits the integration of the SAPC with any vendor OCS.
+
+In addition, the SAPC provides Ericsson own enhanced implementation of Sy, called Ericsson Sy, for integration with Ericsson OCS, the Charging System/Mobile Broadband Charging. This is referred as the Ericsson Integrated Policy and Charging solution.
+
+The SAPC retrieves the applicable spending limits (Policy Counters according to 3GPP Sy specification, or Policy Groups in Ericsson Sy) from the OCS at IP-CAN Session establishment. This information is used as an input in the policy engine to decide which conditions apply to the subscriber. If there is any change in the spending limit status during the IP-CAN Session, the OCS reports it to the SAPC. And the SAPC can then trigger a reauthorization of the policies enforced into the PCEF.
+
+The SAPC caches all the information retrieved through the 3GPP or Ericsson Sy interface for a subscriber during the IP-CAN Session lifetime. This mechanism avoids extra queries towards the OCS, improving the overall performance of the SAPC. The cache is updated at the reception of an OCS report regarding spending limits change
+
+The SAPC can dynamically select the applicable OCS for the 3GPP Sy or Ericsson Sy interaction by policies depending on the provided information in the Gx request (like, for example, the MSISDN/IMSI series or the roaming status).
+
+3.7 Mobility Based Policy
+The SAPC can provide policy decisions directly to the Ericsson SGSN-MME. This is the purpose of Mobility Based Policy function, and it is achieved by the Ericsson-proprietary Smp reference point. Ericsson Smp is based on a Diameter interface connecting both the SAPC and the Ericsson SGSN-MME.
+
+The function allows the Ericsson SGSN-MME to get subscription-based policy decision from the SAPC. Such policy decisions can consider information provided by the Smp interface (like IMSI, user location, APN) and/or subscription profile data.
+
+The function enables the implementation of the use cases listed below:
+
+PDN-GW selection function: The SAPC selects the IP address (IPv4 and/or IPv6) and/or Fully-Qualified Domain Name (FQDN) of a list of PDN-GWs for routing the User Plane traffic of a 3GPP UE attaching to the network.
+
+Mobility Management function: The SAPC permits the selection of the Subscriber Profile ID (SPID) for RAT/Frequency Selection Priority based on policies. This is a mean for increasing radio optimization.
+
+3.8 External Subscription Profile Repository (SPR) Support
+The SAPC can be configured to use the subscriber profile information available in an external Lightweight Directory Access Protocol version 3 (LDAPv3) SPR during the policy evaluation and decision process.
+
+The SAPC supports external SPRs consisting of several server instances, being capable of sharing the load of the external SPR traffic among all of such server instances.
+
+For enabling operations towards the external SPR, the SAPC introduces the configuration concept of Entity Data Source. The Entity Data Source contains the specification (in an ad-hoc definition language) about where the data is stored. In case the data requested for policy evaluation cannot be fetched from the external SPR, the SAPC (if configured for) uses the ‘unknown subscriber profile’ for providing the policy decisions to the PCEF.
+
+The SAPC can also receive SOAP notifications reporting subscription modifications in the external SPR. Based on that notification, the SAPC can trigger the policy reauthorization process as it is described in Reauthorization Upon Subscription Change.
+
+An example of an external SPR is the 3GPP UDR. However, the SAPC is preintegrated with the Ericsson Centralized User Database (CUDB). For such purpose, the SAPC supports the Web Services Description Language (WSDL) data structure defined for the Ericsson CUDB.
+
+3.8.1 External SPR 1+1+1 Redundancy Support
+The SAPC supports External SPR deployments in a 1+1+1 geographical SPR redundant setup, each of them with multiple SPR server instances.
+
+The function implies the SAPC always connects by default to the SPR site defined as primary, and automatically addresses the secondary SPR site in the event of unresponsiveness from the primary. This same behavior applies in case of failure of the secondary site (not being the primary recovered yet) when the SAPC connects to the third alternative.
+
+When the SPR site becomes available again, the SAPC automatically reconnects to the available site with the highest priority.
+
+This SAPC function is preintegrated with the Ericsson CUDB deployed in a geographical data redundancy 1+1+1 model.
+
+3.9 Time-Based Authorizations
+The SAPC is able to perform the reauthorization of the policies downloaded into the PCEF whenever the validity time for such policy data expires. The SAPC controls internally how long a policy is valid; and once its validity time is over, the SAPC initiates a reauthorization process that might drive to an in-service change of the policy data previously downloaded into the PCEF.
+
+Besides, Time-Based Authorizations are also applied to perform activation/deactivation of any subscriber offering associated with a subscriber. For example, if a subscriber buys a voucher, and such voucher overwrites the subscriber's regular subscription during a certain period, the mechanism triggers the activation/deactivation of the voucher.
+
+3.9.1 Minimize Signaling Storms
+The Operator may configure policies for Time-Based Authorizations to be applied for a subscriber group. This implies the Time-Based Authorization happens simultaneously for all the active subscribers that belong to such subscriber group. In order to minimize reauthorization message storms towards the PCEF, the SAPC spreads the reauthorization messages in different time windows. The window time duration and the number of messages that can be placed in such window can be configured.
+
+3.10 Reauthorization Upon Subscription Change
+The SAPC is able to initiate a reauthorization procedure towards the PCEF when there is a subscriber profile update that implies changes in the policies previously enforced in the PCEF. Once the subscriber profile is modified, the SAPC makes a policy reevaluation, and sends the new policies to be enforced to the PCEF by Gx Reauthorization Request (RAR).
+
+3.11 Flexible Output Protocol
+Flexible Output Protocol is the SAPC toolbox enabling the adaptation of the outgoing the SAPC signaling according to its neighbor nodes (for example, the PCEF) protocol needs. Its main purpose is to facilitate the inter-operation with neighbor nodes that are not fully standard compliant and may manage vendor-specific information. The function then allows the introduction of non-standard vendor-specific attributes, or the modification of the standard one, in the SAPC responses by configuration.
+
+The SAPC applies Flexible Output Protocol depending on the evaluation of dynamic conditions, defined with Flexible Output policies. The function takes the result of the SAPC business logic, and using such policies, enhances the resulting message with the needed information. The message is delivered then afterwards to the neighbor node.
+
+The SAPC 1 provides Flexible Output Protocol only for the Gx reference point. However, this function could be extended in the future for the remaining the SAPC reference points.
+
+3.12 Fair Usage Policies
+Operators around the world are experiencing new customer behaviors based on the Networked Society paradigm - that is people, business and society are using connected devices, no matter the kind of access, to their benefit. One of the consequences of such paradigm is a huge increase of data traffic. This challenges current Operator business models, implying the need of finding new sources of revenues plus the efficient handling of the existing resources.
+
+With such target, Operators are deploying policy management solutions based on usage control (also known as Fair Usage Policies). Based on such Fair Usage Policies, an Operator could, for instance, downgrade the subscriber bandwidth in case it consumes more than 5 GB of data traffic in a monthly period.
+
+The SAPC is the critical network element for the implementation of Fair Usage Policies. The SAPC is the responsible for accumulating the volume consumed by the subscriber, calculating the applicable quotas, and making policy decisions - either access control, bandwidth management, or QoS control policy decisions - based on the accumulation status and the configured volume thresholds.
+
+The solution is founded in 3GPP PCC Architecture (Policy and charging control architecture, 3GPP TS 23.203 v16.3.0), where the SAPC implements the PCRF. The SAPC provides Fair Usage Policies for controlling volume and/or time usage. The usage control can be performed either at service level (thus PCC Rule level), including static, preconfigured and dynamic services; or IP session level (that is overall traffic). The volume consumption and time consumption per service or IP session is handled by different counters.
+
+In particular, Fair Usage Policies for preconfigured or dynamic services allows the implementation of usage monitoring control on services requesting guaranteed bearer characteristics, for example ViLTE. For those services, once the subscriber consumes its usage allowance, the SAPC can bar the service access. And if it is a dynamic service (see Dynamic Policy Control), the SAPC reports such service barring to the AF.
+
+According to Policy and Charging Control (PCC); Reference points, 3GPP TS 29.212 v16.3.0, the set of service IP flows treated as a group for usage reporting purposes is called Monitoring Key. The SAPC can select the Monitoring Key associated to preconfigured and dynamic services either by statically provisioned data, or by dynamic policy conditions. For static services, such association is configured at the PCEF.
+
+3.12.1 Fair Usage Policies Procedure
+At IP-CAN Session establishment (that is the SAPC receives a Gx CCR message with CC-Request-Type AVP set to the value INITIAL_REQUEST), the SAPC provides, in addition to the applicable policies for the IP Session, the volume and/or time quotas to be controlled by the PCEF in the Gx Credit Control Answer (CCA). When any of the provided quotas is consumed, the PCEF requests an IP-CAN Session Update to the SAPC (that is the reception of a Gx CCR message with CC-Request-Type AVP set to the value UPDATE_REQUEST). The SAPC updates then the usage accumulator, checks its limit, and decides the appropriate policies to be enforced - which are reported to the PCEF in the consecutive Gx CCA message.
+
+At IP-CAN Session termination, the PCEF reports the actual consumption to the SAPC (by Gx CCR message with CC-Request-Type AVP set to the value TERMINATION_REQUEST). The SAPC can then update the usage accumulator with the actual consumption.
+
+When the reset period is reached (for example, the date ending the monthly Fair Usage Policies subscription), the SAPC automatically resets the usage accumulators, and reports the new applicable policies for the active IP-CAN sessions by a Gx RAR.
+
+3.12.2 Life Cycle of Usage Reporting Accumulators
+The SAPC may be configured to accumulate the usage in two different types of accumulators:
+
+Session accumulator: Volume and/or time consumption is stored during the existing IP-CAN Session or IP Session level. The SAPC stores consumption accumulators at session level and reset them every time the user disconnects
+
+Permanent accumulator: Volume and/or time consumption is stored during a configured period (a month or a configured number of days or hours). In this case, the SAPC stores usage accumulators at subscriber level as they persist across different IP-CAN Sessions or IP Sessions. The configured period might be based on a billing cycle. The SAPC stores usage accumulators during a billing cycle and reset them on the specified billing date.
+
+Both ways may coexist in a SAPC in live operation.
+
+3.12.3 Usage Limits
+The usage limits are used to trigger the subscriber policy evaluation whenever the usage performed by a subscriber surpasses such usage limits. Usage limits may be defined:
+
+At subscriber and/or subscriber group level.
+
+Associated with each particular counter: Different limits for a particular service or group of services or for the total traffic.
+
+Intermediate limits (that is multiple thresholds) associated with the same usage accumulator. Intermediate limits can be expressed in terms of absolute value, or as a percentage of the final limit.
+
+Usage limit shared by a number of users (for example, a corporation or members of the same family).
+
+Usage limits can be defined for time control (only applicable to Gx-based Fair Usage Policies), or volume control. In the case of volume usage limits, they can be different for downlink and uplink data traffic. They can also be specified for bidirectional traffic.
+
+3.12.4 Conditional Accumulation
+The SAPC can perform differentiated control of the volume or time consumption only when certain conditions apply. For instance, to make the control for the accumulated usage only during the rush hours.
+
+Moreover, the SAPC enables the usage of different accumulators for every condition. Then SAPC can take independent decisions, each of them based on the state of each of the specific counters. For example, the Operator might configure two different counters. The first one is for controlling volume consumption during the rush hour, and the second counter applies only for volume consumption control during weekends. When the first counter surpasses the limit, the SAPC could download a policy decision for bandwidth management. Alternatively, when the second counter surpasses the limit, the SAPC could apply an access control policy.
+
+3.12.5 Vouchers Support
+In addition to the application of Fair Usage Policies for normal subscriptions, the SAPC allows the handling of vouchers or promotions. For such purpose, the SAPC associates a voucher to a subscriber including one or several usage limits and an expiry date that is not periodically reset. The SAPC triggers a reevaluation of subscriber-related policies whenever a limit is surpassed or the expiry date is reached.
+
+The SAPC enables the refill of the voucher by extending the voucher usage limits and/or expiry date.
+
+3.12.6 Quota Slicing
+The SAPC allows the configuration of quota slices, that is the split of the whole volume or time quota in smaller pieces. That implies only such smaller quota slices are the ones exchanged between the SAPC and the PCEF.
+
+This functionality enables the SAPC to handle a more updated usage accumulator because of the update period is reduced (the provided quota is consumed earlier than the whole quota). However, there is an increase in the amount of signalling between the SAPC and the PCEF.
+
+3.12.7 Quota Rollover
+The SAPC supports to transfer the volume or time quota not consumed during a billing period to the next one, but not to successive periods. The calculation of the quota to be rolled over is done automatically at the end of current period (at the reset period). Therefore, and for the next period, the data usage limit (time or volume) consists of the data usage limit entitled in the subscription plus the data rolled over from previous period.
+
+The SAPC provides a flexible configuration of the rollover quota function:
+
+The rollover can be applied to all the unused quota, or to a percentage of it.
+
+The consumption of the rolled over quota in the next period can be configured for being done first, or after the data plan quota consumption.
+
+The rollover can be configured for absolute and conditional limits.
+
+Quota rollover can be applied just to specific usage limits within the same data plan.
+
+Shared data plans can be defined with or without quota rollover.
+
+The quota rollover is not provided for session limits, complementary limits, dynamic quota aggregation, and prepaid (buckets) plans.
+
+3.12.8 Reporting Intervals
+The SAPC permits the definition of reporting interval times. It consists of the setup of the maximum time between usage reports from the PCEF, to force the reception of usage information in regular time intervals, independently of the number of bytes consumed by the subscriber.
+
+This function prevents the SAPC from not receiving usage reporting for a long period.
+
+3.12.9 Shared Data Plans
+The SAPC permits configuring several subscribers sharing a common usage limit. An example of Shared Data Plan use case is the following: family access to Internet with a maximum usage limit of megabytes; the SAPC is able to control the usage reporting for different members of the family simultaneously. Shared Data Plans are also applicable for corporate users reporting to the same counter to limit the monthly cost
+
+Shared Device Plans is a special application of the Shared Data Plans concept: the SAPC allows the usage control of a common subscription over different devices (multi-SIM).
+
+3.12.10 Access to Accumulated Usage Information
+The volume or time consumed accumulated by the SAPC is stored in the SAPC internal database. A customer care system can access to such information through the Representational State Transfer (REST) API.
+
+It is also possible to reset the stored volume consumed to 0 by REST API.
+
+3.12.11 Advanced Usage Reporting
+The SAPC supports usage reporting capabilities for subscribers with multiple IP sessions. It provides then the handling of a common quota for different IP sessions and it is able to reevaluate and reauthorize (if needed) all the ongoing sessions for the same subscriber once one of the sessions has reported a limit surpassed.
+
+The SAPC also supports different behaviors for the multiple IP sessions, being able to provide conditional accumulation based on the different IP sessions and PDN Identifiers the subscriber is connected to.
+
+The SAPC allows the aggregation of the limits a subscriber has defined in its different subscriber groups, into a new aggregated usage limit. The management of the consumption related with the aggregated limits is also handled in an aggregated accumulator.
+
+Note:	The aggregation capability is only provided for subscriber groups related to postpaid subscriptions.
+The SAPC permits both the automatic activation of multiple instances of the same prepaid data plan (with the same absolute volume or time limits), and the automatic refill of a postpaid data plan up to the number of refills contracted by the subscriber. These functions are called Stackable Data Plans, and Refillable Data Plans respectively. Therefore, when the SAPC activates a subsequent instance, the SAPC resets the usage accumulator, and marks the new instance in use. These functions cannot be implemented for subscriber groups containing complementary, session, or conditional limits.
+
+4 Interfaces
+A simplified reference model of the SAPC is shown in Figure 1. The reference model for the SAPC North-Bound is described in Ericsson Service-Aware Policy Controller 1.
+
+
+Figure 1   The SAPC as a PCRF Reference Model
+The integration points are described as follows:
+
+The SAPC provides support for 3GPP Rel-9 to 15 Gx interfaces towards the Mobile Broadband PDN-GW, the Fixed Broadband MS-BNG, Gi-Boxes (for example a DPI), or the Ericsson Wi-Fi Gateway.
+
+The SAPC interacts with the 3GPP TDF by 3GPP Rel-14 Sd reference point.
+
+The SAPC sends the subscriber information towards the SDN-Controller over SOAP notifications.
+
+The SAPC implements the Sp reference point towards the external SPR. This implementation is compliant with 3GPP Ud protocol. The SAPC reads and writes subscription data from such external SPR by LDAPv3. The SAPC supports SOAP notifications to receive updates regarding subscription changes from the external SPR.
+
+The SAPC includes 3GPP Rel-15 Sy support for getting the spending limits status from the 3GPP OCS. In addition, the SAPC provides Ericsson Sy interface for integration with the Ericsson Charging System/Mobile Broadband Charging.
+
+The SAPC interworks with the Ericsson SGSN-MME by Smp interface for Mobility Based Policy.
+
+The SAPC provides 3GPP Rel-15 Rx interfaces for implementing Dynamic Policy Control for both IMS services (P-CSCF), non-IMS services (AF), and exposure services (SCEF acting as AF).
+
+Legal  |© Ericsson AB 2022
