@@ -1,6 +1,5 @@
 streamlit
-openai
 llama-index
-llama-index-llms-openai
+llama-index-llms-cohere
 nltk
 pypdf
