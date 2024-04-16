@@ -1,5 +1,6 @@
 import streamlit as st
 from llama_index.llms.cohere import Cohere
+from llama_index.embeddings.cohereai import CohereEmbedding
 try:
   from llama_index import VectorStoreIndex, ServiceContext, Document, SimpleDirectoryReader
 except ImportError:
@@ -22,7 +23,9 @@ def load_data():
         docs = reader.load_data()
         # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert o$
         # index = VectorStoreIndex.from_documents(docs)
-        service_context = ServiceContext.from_defaults(llm=Cohere(api_key=st.secrets.cohere_key,model="embed-multilingual-v3.0", temperature=0.5, system_prompt="You are an expert on Core Network Telecomunnications and your job is to answer technical questions. Assume that all questions are related to Core Network equipments. Keep your answers technical and based on facts – do not hallucinate features."))
+        embed_model = CohereEmbedding(cohere_api_key=st.secrets.cohere_key,model="embed-multilingual-v3.0",input_type="search_query")
+        service_context = ServiceContext.from_defaults(llm=Cohere(api_key=st.secrets.cohere_key,model="commands", temperature=0.5, system_prompt="You are an expert on Core Network Telecomunnications and your job is to answer technical questions. Assume that all questions are related to Core Network equipments. Keep your answers technical and based on facts – do not hallucinate features."),
+                                                    embed_model=embed_model)
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
