@@ -22,7 +22,7 @@ def load_data():
         docs = reader.load_data()
         # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert o$
         # index = VectorStoreIndex.from_documents(docs)
-        service_context = ServiceContext.from_defaults(llm=Cohere(cohere_api_key=st.secrets.cohere_key,model="embed-multilingual-v3.0", temperature=0.5, system_prompt="You are an expert on Core Network Telecomunnications and your job is to answer technical questions. Assume that all questions are related to Core Network equipments. Keep your answers technical and based on facts – do not hallucinate features."))
+        service_context = ServiceContext.from_defaults(llm=Cohere(api_key=st.secrets.cohere_key,model="embed-multilingual-v3.0", temperature=0.5, system_prompt="You are an expert on Core Network Telecomunnications and your job is to answer technical questions. Assume that all questions are related to Core Network equipments. Keep your answers technical and based on facts – do not hallucinate features."))
         index = VectorStoreIndex.from_documents(docs, service_context=service_context)
         return index
 
