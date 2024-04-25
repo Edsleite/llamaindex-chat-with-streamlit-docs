@@ -1,7 +1,7 @@
 # chat by romer/eddie
 import streamlit as st
 from llama_index.core import Settings
-from llama_index.llms.ollama import ollama
+from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 try:
   from llama_index import VectorStoreIndex, ServiceContext, Document, SimpleDirectoryReader
