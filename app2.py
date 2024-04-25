@@ -25,7 +25,7 @@ def load_data():
         docs = reader.load_data()
         # llm = OpenAI(model="gpt-3.5-turbo", temperature=0.5, system_prompt="You are an expert o$
         # index = VectorStoreIndex.from_documents(docs)
-        llm=ollama(model="llama3", request_timeout=300.0)
+        llm=Ollama(model="llama3", request_timeout=300.0)
         embed_model = HuggingFaceEmbedding( model_name="BAAI/bge-large-en-v1.5", trust_remote_code=True)
 
         Settings.embed_model = embed_model
